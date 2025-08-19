@@ -1,7 +1,7 @@
 from flask import Flask , send_from_directory
 import psycopg2
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="frontend", static_url_path="/static")
 
 # เชื่อมต่อฐานข้อมูล
 conn = psycopg2.connect(

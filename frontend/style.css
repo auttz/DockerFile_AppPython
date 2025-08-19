@@ -1,0 +1,26 @@
+*{
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    font-family: "Kanit", sans-serif;
+}
+
+.insertbox{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    gap: 10px;
+}
+.btn_search{
+    padding: 5px;
+    border-radius: 2px;
+    background-color: white; 
+}
+.input_text{
+    padding: 5px;
+}
+
+.btn_search:hover{
+    cursor: pointer;
+}
