@@ -27,10 +27,7 @@ def show_students():
             )
             cur = conn.cursor()
             # ใช้ ILIKE + wildcard เพื่อค้นหาบางส่วน (partial match)
-            cur.execute(
-                "SELECT name, age, grade FROM students WHERE name ILIKE %s",
-                (f"%{name}%",)
-            )
+            cur.execute("SELECT name, age, grade FROM students WHERE name ILIKE %s",(f"%{name}%",))
             results = cur.fetchall()
             cur.close()
             conn.close()
