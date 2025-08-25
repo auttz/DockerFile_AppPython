@@ -25,7 +25,7 @@ def show_students():
         if name:  # ถ้ามีการกรอกชื่อ
             conn = psycopg2.connect(host=DB_HOST, port=DB_PORT, dbname=DB_NAME, user=DB_USER, password=DB_PASS)
             cur = conn.cursor()
-            # ใช้ ILIKE + wildcard เพื่อค้นหาบางส่วน (partial match)
+            # ใช้ ILIKE เพื่อค้นหาบางส่วน (partial match)
             cur.execute("SELECT name, age, grade FROM students WHERE name ILIKE %s",(f"%{name}%",))
             results = cur.fetchall()
             cur.close()
