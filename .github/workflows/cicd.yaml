@@ -2,32 +2,30 @@ name: Docker Image CI/CD
 
 on:
   push:
-    branches: [ "main" ]   # pipeline จะทำงานเมื่อ push ไป main branch
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. ดึงโค้ดจาก repo
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Login Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 3. Build Docker image (สร้าง 2 tag: latest + commit hash)
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:latest \
-                       -t ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:${{ github.sha }} .
+          VERSION=1.0.${{ github.run_number }}
+          echo "Building version $VERSION"
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION .
 
-      # 4. Push Docker image (ทั้ง 2 tag)
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:${{ github.sha }}
+          VERSION=1.0.${{ github.run_number }}
+          echo "Pushing version $VERSION"
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION
