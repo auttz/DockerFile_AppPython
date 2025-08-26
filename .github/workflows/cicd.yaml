@@ -36,7 +36,7 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:latest
 
-      # 5. Deploy ด้วย docker-compose (บน server)
+      # 5.Deploy ด้วย docker-compose (บน server)
       - name: Deploy with docker-compose
         run: |
           cd /home/devops/Docker_Compose_File
