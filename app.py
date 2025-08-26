@@ -22,7 +22,7 @@ def show_students():
     if request.method == "POST":
         name = request.form.get("name", "").strip()
 
-        if name:  # ถ้ามีการกรอกชื่อ
+        if name:  #ถ้ามีการกรอกชื่อ
             conn = psycopg2.connect(host=DB_HOST, port=DB_PORT, dbname=DB_NAME, user=DB_USER, password=DB_PASS)
             cur = conn.cursor()
             # ใช้ ILIKE เพื่อค้นหาบางส่วน
