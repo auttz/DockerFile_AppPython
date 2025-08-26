@@ -36,7 +36,7 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:latest
 
-      # 5. Deploy ไปยัง server ผ่าน SSH
+      # 5 .Deploy ไปยัง server ผ่าน SSH
       - name: Deploy to Server
         uses: appleboy/ssh-action@v0.1.10
         with:
