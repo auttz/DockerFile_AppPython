@@ -20,19 +20,21 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 3. Build Docker image (tag = 2.x โดย x คือ run_number)
+      # 3. Build Docker image (tag ทั้ง version + latest)
       - name: Build Docker image
         run: |
           VERSION=2.${{ github.run_number }}
           echo "Building version $VERSION"
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION \
+                       -t ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:latest .
 
-      # 4. Push Docker image
+      # 4. Push Docker image (ทั้ง version + latest)
       - name: Push Docker image
         run: |
           VERSION=2.${{ github.run_number }}
           echo "Pushing version $VERSION"
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:latest
 
       # 5. Deploy ไปยัง server ผ่าน SSH
       - name: Deploy to Server
