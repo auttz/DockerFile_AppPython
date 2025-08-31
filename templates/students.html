@@ -26,12 +26,20 @@
                 <th width="40%" align="center">ชื่อ</th>
                 <th width="20%" align="center">อายุ</th>
                 <th width="20%" align="center">เกรด</th>
+                <th width="20%" align="center">แก้ไข</th>
             </tr>
             {% for row in results %}
             <tr>
                 <td align="center">{{ row[0] }}</td>
                 <td align="center">{{ row[1] }}</td>
                 <td align="center">{{ row[2] }}</td>
+                <td>
+                    <div class="add_delete_box">
+                        <button class="btn_add" type="submit">เพิ่ม</button>
+                        <button class="btn_delete" type="submit">ลด</button>
+                    </div>
+
+                </td>
             </tr>
             {% endfor %}
         </table>

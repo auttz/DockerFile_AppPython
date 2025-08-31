@@ -4,6 +4,19 @@
     box-sizing: border-box;
     font-family: "Kanit", sans-serif;
 }
+.add_delete_box{
+    margin: 5px 5px;
+}
+.btn_add{
+    padding: 5px;
+    border-radius: 2px;
+    background-color: white;
+}
+.btn_delete{
+    padding: 5px;
+    border-radius: 2px;
+    background-color: white;
+}
 
 .insertbox{
     display: flex;
