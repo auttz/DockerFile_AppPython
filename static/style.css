@@ -4,20 +4,31 @@
     box-sizing: border-box;
     font-family: "Kanit", sans-serif;
 }
+.add_student_box{
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.add_student_box:hover{
+    cursor: pointer;
+}
+.btn_add_student{
+    padding: 5px;
+}
 .add_delete_box{
     margin: 5px 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-.btn_add{
+.btn_delete_student:hover{
+    cursor: pointer;
+}
+.btn_delete_student{
     padding: 5px;
-    border-radius: 2px;
-    background-color: white;
+    border: 5px; 
 }
-.btn_delete{
-    padding: 5px;
-    border-radius: 2px;
-    background-color: white;
-}
-
 .insertbox{
     display: flex;
     justify-content: center;

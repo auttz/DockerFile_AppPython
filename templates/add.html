@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>เพิ่มนักเรียน</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <h2 style="text-align:center;">เพิ่มนักเรียนใหม่</h2>
+    <form method="POST" action="/add" style="text-align:center;">
+        <label>ชื่อ: <input type="text" name="name" required></label><br><br>
+        <label>อายุ: <input type="number" name="age" required></label><br><br>
+        <label>เกรด: <input type="number" step="0.01" name="grade" required></label><br><br>
+        <button type="submit">บันทึก</button>
+        <a href="/students">ยกเลิก</a>
+    </form>
+</body>
+
+</html>

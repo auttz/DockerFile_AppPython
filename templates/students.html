@@ -16,6 +16,12 @@
         <button type="submit" class="btn_search">ค้นหา</button>
     </form>
 
+    <div class="add_student_box">
+        <form method="GET" action="/add">
+            <button type="submit" class="btn_add_student">เพิ่มนักเรียน</button>
+        </form>
+    </div>
+
     <!-- กล่องผลลัพธ์ -->
     {% if results is not none %}
     <div class="resultbox">
@@ -30,13 +36,16 @@
             </tr>
             {% for row in results %}
             <tr>
-                <td align="center">{{ row[0] }}</td>
                 <td align="center">{{ row[1] }}</td>
                 <td align="center">{{ row[2] }}</td>
+                <td align="center">{{ row[3] }}</td>
                 <td>
                     <div class="add_delete_box">
-                        <button class="btn_add" type="submit">เพิ่ม</button>
-                        <button class="btn_delete" type="submit">ลด</button>
+                        <form method="POST" action="/delete/{{ row[0] }}"
+                            onsubmit="return confirm('คุณต้องการลบข้อมูลนี้จริงหรือไม่?');">
+                            <button type="submit" class="btn_delete_student">ลบ</button>
+                        </form>
+
                     </div>
 
                 </td>
@@ -48,6 +57,7 @@
         {% endif %}
     </div>
     {% endif %}
+
 
 </body>
 
