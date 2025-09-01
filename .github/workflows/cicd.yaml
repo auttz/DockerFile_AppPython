@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted   # ✅ ใช้ self-hosted runner (เครื่อง server)
+    runs-on: self-hosted
 
     steps:
       # 1. ดึงโค้ดจาก repo
@@ -24,25 +24,27 @@ jobs:
       - name: Test Docker access
         run: docker ps
 
-      # 3. Build Docker image (tag = latest + run_number)
+      # 3. Build Docker image (tag = 1.run_number.0-main-commit6)
       - name: Build Docker image
         run: |
-          VERSION=2.${{ github.run_number }}
+          COMMIT_SHA=$(echo $GITHUB_SHA | cut -c1-6)
+          VERSION="1.${{ github.run_number }}.0-main-${COMMIT_SHA}"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Building version $VERSION"
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION .
-          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:latest
 
       # 4. Push Docker image
       - name: Push Docker image
         run: |
-          VERSION=2.${{ github.run_number }}
           echo "Pushing version $VERSION"
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:latest
 
-      # 5.Deploy ด้วย docker-compose (บน server)
+      # 5. Deploy ด้วย docker-compose (บน server)
       - name: Deploy with docker-compose
         run: |
           cd /home/devops/Docker_Compose_File
+          cp docker-compose.tpl.yml docker-compose.yml
+          sed -i "s/<IMAGE_TAG>/$VERSION/g" docker-compose.yml
+
           docker-compose pull
           docker-compose up -d
