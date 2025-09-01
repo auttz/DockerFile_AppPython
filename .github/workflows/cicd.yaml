@@ -9,11 +9,18 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      # 1. ดึงโค้ดจาก repo
+      # 1. ดึงโค้ดจาก repo หลัก
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Login Docker Hub
+      # 2. ดึงโค้ดจาก repo docker-compose-repo (สำหรับไฟล์ tpl)
+      - name: Checkout docker-compose-repo
+        uses: actions/checkout@v3
+        with:
+          repository: your-org/docker-compose-repo   # 👈 แก้เป็น owner/repo จริง
+          path: docker-compose-repo
+
+      # 3. Login Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -24,7 +31,7 @@ jobs:
       - name: Test Docker access
         run: docker ps
 
-      # 3. Build Docker image (tag = 1.run_number.0-main-commit6)
+      # 4. Build Docker image (tag = 1.run_number.0-main-commit6)
       - name: Build Docker image
         run: |
           COMMIT_SHA=$(echo $GITHUB_SHA | cut -c1-6)
@@ -33,17 +40,17 @@ jobs:
           echo "Building version $VERSION"
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION .
 
-      # 4. Push Docker image
+      # 5. Push Docker image
       - name: Push Docker image
         run: |
           echo "Pushing version $VERSION"
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION
 
-      # 5. Deploy ด้วย docker-compose (บน server)
+      # 6. Deploy ด้วย docker-compose (บน server)
       - name: Deploy with docker-compose
         run: |
           cd /home/devops/Docker_Compose_File
-          cp docker-compose.tpl.yml docker-compose.yml
+          cp $GITHUB_WORKSPACE/docker-compose-repo/docker-compose.tpl.yml docker-compose.yml
           sed -i "s/<IMAGE_TAG>/$VERSION/g" docker-compose.yml
 
           docker-compose pull
