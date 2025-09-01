@@ -9,16 +9,19 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      # 1. ดึงโค้ดจาก repo หลัก (DockerFile_AppPython)
-      - name: Checkout code
+      # 1. Checkout code app (DockerFile_AppPython)
+      - name: Checkout app repo
         uses: actions/checkout@v3
+        with:
+          repository: auttz/DockerFile_AppPython
+          path: app-repo
 
-      # 2. ดึงโค้ดจาก repo Docker_Compose_File (สำหรับไฟล์ tpl)
-      - name: Checkout docker-compose-repo
+      # 2. Checkout compose repo (Docker_Compose_File)
+      - name: Checkout compose repo
         uses: actions/checkout@v3
         with:
           repository: auttz/Docker_Compose_File
-          path: docker-compose-repo
+          path: compose-repo
 
       # 3. Login Docker Hub
       - name: Log in to Docker Hub
@@ -27,30 +30,31 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # เพื่อยืนยันว่า runner ใช้ docker
+      # 4. Test Docker access
       - name: Test Docker access
         run: docker ps
 
-      # 4. Build Docker image (tag = 1.run_number.0-main-commit6)
+      # 5. Build Docker image (tag = 1.run_number.0-main-commit6)
       - name: Build Docker image
         run: |
           COMMIT_SHA=$(echo $GITHUB_SHA | cut -c1-6)
           VERSION="1.${{ github.run_number }}.0-main-${COMMIT_SHA}"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Building version $VERSION"
+          cd app-repo
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION .
 
-      # 5. Push Docker image
+      # 6. Push Docker image
       - name: Push Docker image
         run: |
           echo "Pushing version $VERSION"
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION
 
-      # 6. Deploy ด้วย docker-compose (บน server)
+      # 7. Deploy ด้วย docker-compose
       - name: Deploy with docker-compose
         run: |
           cd /home/devops/Docker_Compose_File
-          cp $GITHUB_WORKSPACE/docker-compose-repo/docker-compose.tpl.yml docker-compose.yml
+          cp $GITHUB_WORKSPACE/compose-repo/docker-compose.tpl.yml docker-compose.yml
           sed -i "s/<IMAGE_TAG>/$VERSION/g" docker-compose.yml
 
           docker-compose pull
