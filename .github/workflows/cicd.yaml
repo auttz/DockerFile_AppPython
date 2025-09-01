@@ -9,15 +9,15 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      # 1. ดึงโค้ดจาก repo หลัก
+      # 1. ดึงโค้ดจาก repo หลัก (DockerFile_AppPython)
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. ดึงโค้ดจาก repo docker-compose-repo (สำหรับไฟล์ tpl)
+      # 2. ดึงโค้ดจาก repo Docker_Compose_File (สำหรับไฟล์ tpl)
       - name: Checkout docker-compose-repo
         uses: actions/checkout@v3
         with:
-          repository: your-org/docker-compose-repo   # 👈 แก้เป็น owner/repo จริง
+          repository: auttz/Docker_Compose_File
           path: docker-compose-repo
 
       # 3. Login Docker Hub
