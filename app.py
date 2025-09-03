@@ -63,22 +63,31 @@ def show_students():
     results = []
     name = None
 
-    if request.method == "POST":
-        name = request.form.get("name", "").strip()
+    conn = psycopg2.connect(
+        host=DB_HOST, port=DB_PORT, dbname=DB_NAME,
+        user=DB_USER, password=DB_PASS
+    )
+    cur = conn.cursor()
 
-        if name:  # ถ้ามีการกรอกชื่อ
-            conn = psycopg2.connect(
-                host=DB_HOST, port=DB_PORT, dbname=DB_NAME,
-                user=DB_USER, password=DB_PASS
+    if request.method == "POST":
+        # ถ้ามีการค้นหา
+        name = request.form.get("name", "").strip()
+        if name:
+            cur.execute(
+                "SELECT id, name, age, grade FROM students WHERE name ILIKE %s",
+                (f"%{name}%",)
             )
-            cur = conn.cursor()
-            # ใช้ ILIKE เพื่อค้นหาบางส่วน และ SELECT id ด้วย
-            cur.execute("SELECT id, name, age, grade FROM students WHERE name ILIKE %s", (f"%{name}%",))
             results = cur.fetchall()
-            cur.close()
-            conn.close()
+    else:
+        # GET → ดึงข้อมูลทั้งหมด
+        cur.execute("SELECT id, name, age, grade FROM students ORDER BY id")
+        results = cur.fetchall()
+
+    cur.close()
+    conn.close()
 
     return render_template("students.html", results=results, name=name)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
