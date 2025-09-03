@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, redirect
 import psycopg2
 import os
+from flask import jsonify
 
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
@@ -55,9 +56,7 @@ def delete_student(student_id):
     conn.commit()
     cur.close()
     conn.close()
-
-    # หลังลบเสร็จ redirect กลับไปยังหน้าค้นหา
-    return redirect("/students")
+    return jsonify({"status": "success", "id": student_id})
 
 @app.route("/students", methods=["GET", "POST"])
 def show_students():
