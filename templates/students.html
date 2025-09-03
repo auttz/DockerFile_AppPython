@@ -2,63 +2,76 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Students Search</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8">
+  <title>Students Search</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="bg-light">
+
+  <div class="container mt-5">
 
     <!-- กล่องค้นหา -->
-    <form method="POST" action="/students" class="insertbox">
-        <h3>ค้นหาข้อมูลนักเรียน</h3>
-        <input type="text" name="name" placeholder="ชื่อนักเรียน" required class="input_text">
-        <button type="submit" class="btn_search">ค้นหา</button>
-    </form>
-
-    <div class="add_student_box">
-        <form method="GET" action="/add">
-            <button type="submit" class="btn_add_student">เพิ่มนักเรียน</button>
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h3 class="text-center mb-3">ค้นหาข้อมูลนักเรียน</h3>
+        <form method="POST" action="/students" class="d-flex justify-content-center gap-2">
+          <input type="text" name="name" placeholder="ชื่อนักเรียน" required class="form-control w-50">
+          <button type="submit" class="btn btn-primary">ค้นหา</button>
         </form>
+      </div>
+    </div>
+
+    <!-- ปุ่มเพิ่มนักเรียน -->
+    <div class="mb-4 text-end">
+      <form method="GET" action="/add">
+        <button type="submit" class="btn btn-success">+ เพิ่มนักเรียน</button>
+      </form>
     </div>
 
     <!-- กล่องผลลัพธ์ -->
     {% if results is not none %}
-    <div class="resultbox">
+    <div class="card shadow-sm">
+      <div class="card-body">
         {% if results %}
-        <h2>ผลลัพธ์การค้นหา</h2>
-        <table border="1" cellpadding="12" cellspacing="0" width="30%" align="center">
+        <h2 class="mb-3">ผลลัพธ์การค้นหา</h2>
+        <table class="table table-bordered table-hover text-center">
+          <thead class="table-secondary">
             <tr>
-                <th width="40%" align="center">ชื่อ</th>
-                <th width="20%" align="center">อายุ</th>
-                <th width="20%" align="center">เกรด</th>
-                <th width="20%" align="center">แก้ไข</th>
+              <th>ชื่อ</th>
+              <th>อายุ</th>
+              <th>เกรด</th>
+              <th>จัดการ</th>
             </tr>
+          </thead>
+          <tbody>
             {% for row in results %}
             <tr>
-                <td align="center">{{ row[1] }}</td>
-                <td align="center">{{ row[2] }}</td>
-                <td align="center">{{ row[3] }}</td>
-                <td>
-                    <div class="add_delete_box">
-                        <form method="POST" action="/delete/{{ row[0] }}"
-                            onsubmit="return confirm('คุณต้องการลบข้อมูลนี้จริงหรือไม่?');">
-                            <button type="submit" class="btn_delete_student">ลบ</button>
-                        </form>
-
-                    </div>
-
-                </td>
+              <td>{{ row[1] }}</td>
+              <td>{{ row[2] }}</td>
+              <td>{{ row[3] }}</td>
+              <td>
+                <form method="POST" action="/delete/{{ row[0] }}"
+                  onsubmit="return confirm('คุณต้องการลบข้อมูลนี้จริงหรือไม่?');">
+                  <button type="submit" class="btn btn-danger btn-sm">ลบ</button>
+                </form>
+              </td>
             </tr>
             {% endfor %}
+          </tbody>
         </table>
         {% else %}
-        <p style="color:red;">ไม่พบนักเรียนชื่อ "{{ name }}"</p>
+        <p class="text-danger">ไม่พบนักเรียนชื่อ "{{ name }}"</p>
         {% endif %}
+      </div>
     </div>
     {% endif %}
 
+  </div>
 
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

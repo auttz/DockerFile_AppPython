@@ -34,9 +34,13 @@ def add_student():
         conn.commit()
         cur.close()
         conn.close()
+        return '''
+        <script>
+            alert("บันทึกเรียบร้อย!");
+            window.location.href = "/students";
+        </script>
+        '''
 
-        return redirect("/students")
-    
     return render_template("add.html")
 
 
@@ -57,7 +61,7 @@ def delete_student(student_id):
 
 @app.route("/students", methods=["GET", "POST"])
 def show_students():
-    results = None
+    results = []
     name = None
 
     if request.method == "POST":
