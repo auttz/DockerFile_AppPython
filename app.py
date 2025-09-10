@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, url_for
 import psycopg2
 import os
 from flask import jsonify
@@ -14,7 +14,7 @@ DB_PASS = os.environ.get("DB_PASS")
 
 @app.route("/")
 def home():
-    return "<h1>Hello Supreecha</h1>"
+    return redirect(url_for("show_students"))
 
 @app.route("/add", methods=["GET", "POST"])
 def add_student():

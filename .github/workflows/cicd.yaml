@@ -6,8 +6,9 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
-
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
     steps:
       # 1. Checkout code app (DockerFile_AppPython)
       - name: Checkout app repo
@@ -16,46 +17,42 @@ jobs:
           repository: auttz/DockerFile_AppPython
           path: app-repo
 
-      # 2. Checkout compose repo (Docker_Compose_File)
-      - name: Checkout compose repo
-        uses: actions/checkout@v3
-        with:
-          repository: auttz/Docker_Compose_File
-          path: compose-repo
-
-      # 3. Login Docker Hub
+      # 2. Login Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 4. Test Docker access
-      - name: Test Docker access
-        run: docker ps
-
-      # 5. Build Docker image (tag = 1.run_number.0-main-commit6)
-      - name: Build Docker image
+      # 3. Build & Push Docker image
+      - name: Build and Push Docker image
+        id: meta
         run: |
           COMMIT_SHA=$(echo $GITHUB_SHA | cut -c1-6)
           VERSION="1.${{ github.run_number }}.0-main-${COMMIT_SHA}"
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Building version $VERSION"
           cd app-repo
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION .
-
-      # 6. Push Docker image
-      - name: Push Docker image
-        run: |
-          echo "Pushing version $VERSION"
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION
 
-      # 7. Deploy ด้วย docker-compose
+  deploy:
+    runs-on: self-hosted
+    needs: build   # ✅ รันต่อเมื่อ build เสร็จ
+    steps:
+      # 1. Checkout compose repo
+      - name: Checkout compose repo
+        uses: actions/checkout@v3
+        with:
+          repository: auttz/Docker_Compose_File
+          path: compose-repo
+
+      # 2. Deploy with docker-compose
       - name: Deploy with docker-compose
         run: |
           cd /home/devops/Docker_Compose_File
           cp $GITHUB_WORKSPACE/compose-repo/docker-compose.tpl.yml docker-compose.yml
-          sed -i "s/<IMAGE_TAG>/$VERSION/g" docker-compose.yml
+          sed -i "s#<IMAGE_TAG>#${{ needs.build.outputs.version }}#g" docker-compose.yml
 
           docker-compose pull
           docker-compose up -d
