@@ -51,8 +51,8 @@ jobs:
       - name: Deploy with docker-compose
         run: |
           cd /home/devops/Docker_Compose_File
-          cp $GITHUB_WORKSPACE/compose-repo/docker-compose.tpl.yml docker-compose.yml
-          sed -i "s#<IMAGE_TAG>#${{ needs.build.outputs.version }}#g" docker-compose.yml
+          cp $GITHUB_WORKSPACE/Docker_Compose_Repo/docker-compose-tpl.yaml docker-compose.yaml
+          sed -i "s#<IMAGE_TAG>#${{ needs.build.outputs.version }}#g" docker-compose.yaml
 
           docker-compose pull
           docker-compose up -d
