@@ -1,58 +1,58 @@
-name: Docker Image CI/CD
+  name: Docker Image CI/CD
 
-on:
-  push:
-    branches: [ "main" ]
+  on:
+    push:
+      branches: [ "main" ]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.meta.outputs.version }}
-    steps:
-      # 1. Checkout code app (DockerFile_AppPython)
-      - name: Checkout app repo
-        uses: actions/checkout@v3
-        with:
-          repository: auttz/DockerFile_AppPython
-          path: app-repo
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+      outputs:
+        version: ${{ steps.meta.outputs.version }}
+      steps:
+        # 1. Checkout code app (DockerFile_AppPython)
+        - name: Checkout app repo
+          uses: actions/checkout@v3
+          with:
+            repository: auttz/DockerFile_AppPython
+            path: app-repo
 
-      # 2. Login Docker Hub
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+        # 2. Login Docker Hub
+        - name: Log in to Docker Hub
+          uses: docker/login-action@v2
+          with:
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 3. Build & Push Docker image
-      - name: Build and Push Docker image
-        id: meta
-        run: |
-          COMMIT_SHA=$(echo $GITHUB_SHA | cut -c1-6)
-          VERSION="1.${{ github.run_number }}.0-main-${COMMIT_SHA}"
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Building version $VERSION"
-          cd app-repo
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION
+        # 3. Build & Push Docker image
+        - name: Build and Push Docker image
+          id: meta
+          run: |
+            COMMIT_SHA=$(echo $GITHUB_SHA | cut -c1-6)
+            VERSION="1.${{ github.run_number }}.0-main-${COMMIT_SHA}"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "Building version $VERSION"
+            cd app-repo
+            docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION .
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/postgresweb:$VERSION
 
-  deploy:
-    runs-on: self-hosted
-    needs: build   # ✅ รันต่อเมื่อ build เสร็จ
-    steps:
-      # 1. Checkout compose repo
-      - name: Checkout compose repo
-        uses: actions/checkout@v3
-        with:
-          repository: auttz/Docker_Compose_File
-          path: Docker_Compose_Repo
+    deploy:
+      runs-on: self-hosted
+      needs: build   # ✅ รันต่อเมื่อ build เสร็จ
+      steps:
+        # 1. Checkout compose repo
+        - name: Checkout compose repo
+          uses: actions/checkout@v3
+          with:
+            repository: auttz/Docker_Compose_File
+            path: Docker_Compose_Repo
 
-      # 2. Deploy with docker-compose
-      - name: Deploy with docker-compose
-        run: |
-          cd /home/devops/Docker_Compose_File
-          cp $GITHUB_WORKSPACE/Docker_Compose_Repo/docker-compose-tpl.yaml docker-compose.yaml
-          sed -i "s#<IMAGE_TAG>#${{ needs.build.outputs.version }}#g" docker-compose.yaml
+        # 2. Deploy with docker-compose
+        - name: Deploy with docker-compose
+          run: |
+            cd /home/devops/Docker_Compose_File
+            cp $GITHUB_WORKSPACE/Docker_Compose_Repo/docker-compose-tpl.yaml docker-compose.yaml
+            sed -i "s#<IMAGE_TAG>#${{ needs.build.outputs.version }}#g" docker-compose.yaml
 
-          docker-compose pull
-          docker-compose up -d
+            docker compose pull
+            docker compose up -d
